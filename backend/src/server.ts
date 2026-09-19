@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import authRoutes from "./routes/auth.routes.js";
 
 dotenv.config(); // reads the key-value pairs from .env and inject the values in process.env
 
@@ -16,6 +17,9 @@ app.use(
 );
 app.use(express.json()); // to parse json request body
 app.use(cookieParser());
+
+// routes
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 8000;
 
