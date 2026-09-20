@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -9,6 +14,7 @@ import { useEffect, useState } from "react";
 import type { User } from "./types/user.types";
 import axios from "axios";
 import { AUTH_API } from "./config/api";
+import ResearchPaperDetails from "./pages/ResearchPaperDetails";
 
 // axios will send cookies with each request
 axios.defaults.withCredentials = true;
@@ -54,8 +60,18 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/signup" element={<Signup setUser={setUser} />} />
-          <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route
+            path="/signup"
+            element={user ? <Navigate to="/" /> : <Signup setUser={setUser} />}
+          />
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/" /> : <Login setUser={setUser} />}
+          />
+          <Route
+            path="/research-papers/:id"
+            element={user ? <ResearchPaperDetails /> : <Navigate to="/login" />}
+          />
           <Route path="*" element={<Notfound />} />
         </Routes>
       </Router>

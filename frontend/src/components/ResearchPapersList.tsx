@@ -14,12 +14,6 @@ const ResearchPapersList = ({
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-black tracking-tight">
-          Research Papers
-        </h1>
-      </div>
-
       {/* Render our highly reusable component */}
       <Table columns={columns} data={researchPapers} />
     </div>

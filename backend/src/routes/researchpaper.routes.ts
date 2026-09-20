@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getResearchPaperController,
   getResearchPapersController,
   uploadResearchPaperController,
 } from "../controllers/researchpaper.controller.js";
@@ -18,5 +19,8 @@ router.post(
 
 // get research papers
 router.get("/", getResearchPapersController);
+
+// get research paper
+router.get("/:id", getResearchPaperController);
 
 export default router;

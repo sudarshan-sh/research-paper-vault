@@ -12,6 +12,7 @@ import {
 } from "../config/upload.js";
 import { toPublicResearchPaper } from "../models/researchpaper.model.js";
 import {
+  getResearchPaperService,
   getResearchPapersService,
   uploadResearchPaperService,
 } from "../services/researchpaper.service.js";
@@ -99,6 +100,26 @@ export const getResearchPapersController = async (
     });
   } catch (error) {
     console.error("Error fetching research papers:", error);
+    return handleResponse(res, 500, "Internal server error");
+  }
+};
+
+// get research paper
+export const getResearchPaperController = async (
+  req: Request,
+  res: Response,
+) => {
+  const id = parsePositiveInt(req.params.id, 0);
+  try {
+    const paper = await getResearchPaperService(id);
+    if (!paper) {
+      return handleResponse(res, 404, "Research paper not found");
+    }
+    return handleResponse(res, 200, "Research paper fetched successfully", {
+      researchPaper: toPublicResearchPaper(paper),
+    });
+  } catch (error) {
+    console.error("Error fetching research paper:", error);
     return handleResponse(res, 500, "Internal server error");
   }
 };

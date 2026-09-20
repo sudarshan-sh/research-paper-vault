@@ -80,3 +80,30 @@ export const getResearchPapers = async (
     throw error;
   }
 };
+
+// get research paper
+export const getResearchPaper = async (id: number) => {
+  const query = `
+    SELECT
+      id,
+      title,
+      authors,
+      abstract,
+      file_name AS "fileName",
+      file_path AS "filePath",
+      file_size_bytes AS "fileSizeBytes",
+      uploaded_by AS "uploadedBy",
+      created_at AS "createdAt"
+    FROM research_papers
+    WHERE id = $1
+    LIMIT 1`;
+  const values = [id];
+  try {
+    const result = await pool.query(query, values);
+    const row = result.rows[0];
+    return row;
+  } catch (error) {
+    console.error("Error fetching research paper:", error);
+    throw error;
+  }
+};

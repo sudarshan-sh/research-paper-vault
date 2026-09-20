@@ -1,4 +1,5 @@
 import {
+  getResearchPaper,
   getResearchPapers,
   uploadResearchPaper,
 } from "../repositories/researchpaper.repository.js";
@@ -38,6 +39,17 @@ export const getResearchPapersService = async (
     };
   } catch (error) {
     console.error("Error fetching research papers:", error);
+    throw error;
+  }
+};
+
+// get research paper
+export const getResearchPaperService = async (id: number) => {
+  try {
+    const paper = await getResearchPaper(id);
+    return paper;
+  } catch (error) {
+    console.error("Error fetching research paper:", error);
     throw error;
   }
 };
