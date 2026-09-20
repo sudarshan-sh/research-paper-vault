@@ -47,8 +47,18 @@ export const getResearchPapers = async (
   page: number,
   pageSize: number,
   search: string | null,
+  userId: number,
 ) => {
-  let query = `
+  const values: Array<number | string> = [userId];
+  let where = `WHERE uploaded_by = $1`;
+
+  if (search) {
+    values.push(`%${search}%`);
+    where += ` AND title ILIKE $${values.length}`;
+  }
+
+  values.push(pageSize, (page - 1) * pageSize);
+  const query = `
     SELECT
       id,
       title,
@@ -58,19 +68,17 @@ export const getResearchPapers = async (
       file_path AS "filePath",
       file_size_bytes AS "fileSizeBytes",
       uploaded_by AS "uploadedBy",
-      created_at AS "createdAt"
+      created_at AS "createdAt",
+      COUNT(*) OVER() AS total_count
     FROM research_papers
+    ${where}
     ORDER BY created_at DESC
-    LIMIT $1 OFFSET $2`;
-  const values: Array<number | string> = [pageSize, (page - 1) * pageSize];
+    LIMIT $${values.length - 1} OFFSET $${values.length}`;
 
-  if (search) {
-    query += ` WHERE title ILIKE $3`;
-    values.push(`%${search}%`);
-  }
   try {
     const result = await pool.query(query, values);
-    const total = result.rows[0]?.total_count || 0;
+    // COUNT is a BIGINT, pg returns it as a string
+    const total = Number(result.rows[0]?.total_count ?? 0);
     const researchPapers = result.rows.map(
       ({ total_count, ...paper }) => paper,
     );

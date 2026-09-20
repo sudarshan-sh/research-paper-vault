@@ -18,7 +18,7 @@ router.post(
 );
 
 // get research papers
-router.get("/", getResearchPapersController);
+router.get("/", protectedRoute, getResearchPapersController);
 
 // get research paper
 router.get("/:id", getResearchPaperController);

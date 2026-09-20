@@ -76,6 +76,12 @@ export const getResearchPapersController = async (
   req: Request,
   res: Response,
 ) => {
+  // the list only shows the papers uploaded by the logged-in user
+  if (!req.user) {
+    return handleResponse(res, 401, "Not authorized!");
+  }
+  const userId = req.user.id;
+
   const page = parsePositiveInt(req.query.page, 1);
   const pageSize = parsePositiveInt(
     req.query.pageSize,
@@ -92,6 +98,7 @@ export const getResearchPapersController = async (
       page,
       pageSize,
       search,
+      userId,
     );
 
     return handleResponse(res, 200, "Research papers fetched successfully", {

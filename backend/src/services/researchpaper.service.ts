@@ -21,12 +21,14 @@ export const getResearchPapersService = async (
   page: number,
   pageSize: number,
   search: string | null,
+  userId: number,
 ) => {
   try {
     const { researchPapers, total } = await getResearchPapers(
       page,
       pageSize,
       search,
+      userId,
     );
     return {
       researchPapers,
