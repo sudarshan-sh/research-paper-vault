@@ -4,7 +4,7 @@ import type { User } from "../types/user.types.js";
 export const toPublicUser = (user: User) => {
   return {
     id: user.id,
-    username: user.username,
+    name: user.name,
     email: user.email,
   };
 };

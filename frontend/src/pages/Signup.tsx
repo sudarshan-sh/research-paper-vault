@@ -32,6 +32,7 @@ const Signup = ({ setUser }: LoginForm) => {
       });
       alert(response.data.message || "Registration successful!");
       setUser(response.data.user);
+      navigate("/");
       // set the user in the local storage
       localStorage.setItem("user", JSON.stringify(response.data.user));
     } catch (error) {

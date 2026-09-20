@@ -10,6 +10,9 @@ import type { User } from "./types/user.types";
 import axios from "axios";
 import { AUTH_API } from "./config/api";
 
+// axios will send cookies with each request
+axios.defaults.withCredentials = true;
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,13 +44,13 @@ function App() {
   return (
     <>
       <Router>
-        <Navbar />
+        <Navbar user={user} setUser={setUser} />
         <Routes>
           <Route
             path="/"
             element={
               <ProtectedRoute user={user}>
-                <Home />
+                <Home user={user} />
               </ProtectedRoute>
             }
           />
