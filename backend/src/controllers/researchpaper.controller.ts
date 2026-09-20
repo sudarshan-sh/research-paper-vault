@@ -146,7 +146,7 @@ export const downloadResearchPaperController = (
 
   // 'E:/FullStack Projects/research-paper-vault/uploads/papers/reinforcement-learning.pdf'
   const absolutePath = path.resolve(BACKEND_ROOT, filePath);
-  // 'uploads/papers/reinforcement-learning.pdf'
+  // 'reinforcement-learning.pdf'
   const relativeToPapers = path.relative(PAPERS_DIR, absolutePath);
   // isInsidePapersDir: true
   const isInsidePapersDir =
