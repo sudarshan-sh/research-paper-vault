@@ -10,3 +10,9 @@ export interface ResearchPaper {
   uploadedBy: number;
   createdAt: Date;
 }
+
+// data required to create a research paper record
+export type CreateResearchPaperInput = Omit<
+  ResearchPaper,
+  "id" | "createdAt"
+>;
