@@ -14,3 +14,4 @@ export const PAPERS_DIR = path.join(BACKEND_ROOT, PAPERS_RELATIVE_DIR);
 
 export const PAPER_FIELD_NAME = "paper"; // formData.append("paper", file)
 export const MAX_PAPER_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+export const MAX_DB_VARCHAR_LENGTH = 100; // title, file_name columns are VARCHAR(100)
