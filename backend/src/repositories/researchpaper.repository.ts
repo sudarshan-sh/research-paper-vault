@@ -49,15 +49,7 @@ export const getResearchPapers = async (
   search: string | null,
   userId: number,
 ) => {
-  const values: Array<number | string> = [userId];
-  let where = `WHERE uploaded_by = $1`;
-
-  if (search) {
-    values.push(`%${search}%`);
-    where += ` AND title ILIKE $${values.length}`;
-  }
-
-  values.push(pageSize, (page - 1) * pageSize);
+  // $1 user, $2 search (NULL = no search), $3 page size, $4 offset
   const query = `
     SELECT
       id,
@@ -71,9 +63,15 @@ export const getResearchPapers = async (
       created_at AS "createdAt",
       COUNT(*) OVER() AS total_count
     FROM research_papers
-    ${where}
+    WHERE uploaded_by = $1
+      AND (
+        $2::text IS NULL
+        OR title ILIKE '%' || $2 || '%'
+        OR array_to_string(authors, ', ') ILIKE '%' || $2 || '%'
+      )
     ORDER BY created_at DESC
-    LIMIT $${values.length - 1} OFFSET $${values.length}`;
+    LIMIT $3 OFFSET $4`;
+  const values = [userId, search, pageSize, (page - 1) * pageSize];
 
   try {
     const result = await pool.query(query, values);

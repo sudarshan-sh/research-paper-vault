@@ -30,6 +30,7 @@ const Home = ({ user }: { user: User | null }) => {
       );
       alert(response.data.message || "Upload successful!");
       setFile(null);
+      fetchPapers(); // refetch the list of papers
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
       alert(err.response?.data?.message || "Upload failed. Please try again.");
@@ -38,18 +39,19 @@ const Home = ({ user }: { user: User | null }) => {
     }
   };
 
+  const fetchPapers = async () => {
+    try {
+      const { data } = await axios.get(
+        `${RESEARCH_PAPER_API}?page=${page}&pageSize=${pageSize}&search=${search}`,
+      );
+      setResearchPapers(data.researchPapers);
+      setTotalPages(data.pagination.totalPages);
+    } catch (error) {
+      console.error("Error fetching research papers:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchPapers = async () => {
-      try {
-        const { data } = await axios.get(
-          `${RESEARCH_PAPER_API}?page=${page}&pageSize=${pageSize}&search=${search}`,
-        );
-        setResearchPapers(data.researchPapers);
-        setTotalPages(data.pagination.totalPages);
-      } catch (error) {
-        console.error("Error fetching research papers:", error);
-      }
-    };
     fetchPapers();
   }, [page, pageSize, search]);
 
