@@ -37,12 +37,6 @@ const Navbar = ({
         <div>
           {user ? (
             <>
-              <Link
-                to="/research-papers"
-                className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Research Papers
-              </Link>
               <span className="text-gray-300 px-3 py-2 rounded-md text-sm font-medium">
                 Welcome, {user?.name}!
               </span>
