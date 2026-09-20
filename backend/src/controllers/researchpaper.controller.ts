@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { Request, Response } from "express";
 import { handleResponse, parsePositiveInt } from "../helper/helper.js";
 import {
@@ -7,7 +8,9 @@ import {
 } from "../helper/file.js";
 import { extractPdfMetadata } from "../helper/pdf.js";
 import {
+  BACKEND_ROOT,
   MAX_DB_VARCHAR_LENGTH,
+  PAPERS_DIR,
   PAPERS_RELATIVE_DIR,
 } from "../config/upload.js";
 import { toPublicResearchPaper } from "../models/researchpaper.model.js";
@@ -129,4 +132,47 @@ export const getResearchPaperController = async (
     console.error("Error fetching research paper:", error);
     return handleResponse(res, 500, "Internal server error");
   }
+};
+
+// download research paper without any DB call.
+export const downloadResearchPaperController = (
+  req: Request,
+  res: Response,
+) => {
+  const { filePath, fileName } = req.body ?? {};
+  if (typeof filePath !== "string" || !filePath) {
+    return handleResponse(res, 400, "File path is required");
+  }
+
+  // absolutePath: 'E:/FullStack Projects/research-paper-vault/uploads/papers/reinforcement-learning.pdf'
+  const absolutePath = path.resolve(BACKEND_ROOT, filePath);
+  // relativeToPapers: 'uploads/papers/reinforcement-learning.pdf'
+  const relativeToPapers = path.relative(PAPERS_DIR, absolutePath);
+  // isInsidePapersDir: true
+  const isInsidePapersDir =
+    relativeToPapers !== "" &&
+    !relativeToPapers.startsWith("..") &&
+    !path.isAbsolute(relativeToPapers);
+
+  if (
+    !isInsidePapersDir ||
+    path.extname(absolutePath).toLowerCase() !== ".pdf"
+  ) {
+    return handleResponse(res, 400, "Invalid file path");
+  }
+
+  // name shown in the save dialog: the original file name when the UI sends one
+  const downloadName =
+    typeof fileName === "string" && fileName
+      ? path.basename(fileName)
+      : path.basename(absolutePath);
+
+  // res.download streams the file and sets Content-Type / Content-Disposition
+  res.download(absolutePath, downloadName, (error) => {
+    if (!error) return;
+    console.error("Error downloading research paper:", error);
+    if (!res.headersSent) {
+      handleResponse(res, 404, "File not found");
+    }
+  });
 };

@@ -68,15 +68,56 @@ const ResearchPaperDetails = () => {
     };
   }, [id]);
 
+  const downloadPaper = async () => {
+    if (!researchPaper) return;
+
+    try {
+      const { data } = await axios.post<Blob>(
+        `${RESEARCH_PAPER_API}/download`,
+        { filePath: researchPaper.filePath, fileName: researchPaper.fileName },
+        { responseType: "blob" },
+      );
+
+      // create a temporary URL in the browser's memory to download the file
+      const localURL = URL.createObjectURL(data);
+      // create a link to download the file
+      const downloadLink = document.createElement("a");
+      downloadLink.href = localURL;
+      downloadLink.download = researchPaper.fileName;
+      downloadLink.click(); // trigger the download
+      URL.revokeObjectURL(localURL); // free memory
+    } catch (err) {
+      // with responseType "blob" an error response is a Blob too, its JSON message is inside
+      let message = "Download failed. Please try again.";
+      try {
+        // try to parse the error body as JSON
+        const blob = (err as AxiosError<Blob>).response?.data;
+        message = JSON.parse((await blob?.text()) ?? "").message || message;
+      } catch {
+        // not a JSON error body, keep the default message
+      }
+      alert(message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <Link
-          to="/"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-white"
-        >
-          <span aria-hidden="true">←</span> Back to papers
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link
+            to="/"
+            className="mb-6 inline-flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-white"
+          >
+            <span aria-hidden="true">←</span> Back to papers
+          </Link>
+          <button
+            onClick={downloadPaper}
+            disabled={!researchPaper}
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Download
+          </button>
+        </div>
 
         {loading ? (
           <DetailsSkeleton />

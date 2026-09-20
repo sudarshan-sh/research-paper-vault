@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  downloadResearchPaperController,
   getResearchPaperController,
   getResearchPapersController,
   uploadResearchPaperController,
@@ -22,5 +23,8 @@ router.get("/", protectedRoute, getResearchPapersController);
 
 // get research paper
 router.get("/:id", getResearchPaperController);
+
+// download research paper (POST: the UI sends filePath and fileName in the body)
+router.post("/download", protectedRoute, downloadResearchPaperController);
 
 export default router;
