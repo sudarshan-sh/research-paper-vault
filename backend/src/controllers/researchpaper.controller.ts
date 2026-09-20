@@ -144,9 +144,9 @@ export const downloadResearchPaperController = (
     return handleResponse(res, 400, "File path is required");
   }
 
-  // absolutePath: 'E:/FullStack Projects/research-paper-vault/uploads/papers/reinforcement-learning.pdf'
+  // 'E:/FullStack Projects/research-paper-vault/uploads/papers/reinforcement-learning.pdf'
   const absolutePath = path.resolve(BACKEND_ROOT, filePath);
-  // relativeToPapers: 'uploads/papers/reinforcement-learning.pdf'
+  // 'uploads/papers/reinforcement-learning.pdf'
   const relativeToPapers = path.relative(PAPERS_DIR, absolutePath);
   // isInsidePapersDir: true
   const isInsidePapersDir =
