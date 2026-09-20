@@ -1,9 +1,18 @@
 import axios, { AxiosError } from "axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { User } from "../types/user.types";
 import { RESEARCH_PAPER_API } from "../config/api";
+import ResearchPapersList from "../components/ResearchPapersList";
+import type { ResearchPaper } from "../types/researchpaper.types";
 
 const Home = ({ user }: { user: User | null }) => {
+  const [researchPapers, setResearchPapers] = useState<ResearchPaper[]>([]);
+  // pagination
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState("");
+  // file input
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +36,27 @@ const Home = ({ user }: { user: User | null }) => {
     } finally {
       setUploading(false);
     }
+  };
+
+  useEffect(() => {
+    const fetchPapers = async () => {
+      try {
+        const { data } = await axios.get(
+          `${RESEARCH_PAPER_API}?page=${page}&pageSize=${pageSize}&search=${search}`,
+        );
+        setResearchPapers(data.researchPapers);
+        setTotalPages(data.pagination.totalPages);
+      } catch (error) {
+        console.error("Error fetching research papers:", error);
+      }
+    };
+    fetchPapers();
+  }, [page, pageSize, search]);
+
+  // reset to page 1 whenever the search term changes
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
   };
 
   return (
@@ -84,34 +114,7 @@ const Home = ({ user }: { user: User | null }) => {
         </div>
       </div>
 
-      {/* Main content — empty state */}
-      <div className="flex flex-col items-center justify-center gap-3 mt-24 text-gray-500">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-12 w-12"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-        <p className="text-sm">No papers uploaded yet.</p>
-        <p className="text-xs">
-          Click{" "}
-          <span
-            className="cursor-pointer text-blue-400 hover:underline"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            + Upload Paper
-          </span>{" "}
-          to get started.
-        </p>
-      </div>
+      <ResearchPapersList researchPapers={researchPapers} />
     </div>
   );
 };

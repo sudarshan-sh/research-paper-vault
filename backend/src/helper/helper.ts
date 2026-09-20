@@ -36,6 +36,17 @@ export const cookieOptions: CookieOptions = {
   maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
 } as const;
 
+// reads a positive integer from a query string value, uses the fallback when it is missing or
+// invalid and caps it at max
+export const parsePositiveInt = (
+  value: unknown,
+  fallback: number,
+  max = Number.MAX_SAFE_INTEGER,
+) => {
+  const parsed = typeof value === "string" ? Number.parseInt(value, 10) : NaN;
+  return parsed >= 1 ? Math.min(parsed, max) : fallback;
+};
+
 // standardize response function
 export const handleResponse = (
   res: Response,

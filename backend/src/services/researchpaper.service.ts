@@ -1,4 +1,7 @@
-import { uploadResearchPaper } from "../repositories/researchpaper.repository.js";
+import {
+  getResearchPapers,
+  uploadResearchPaper,
+} from "../repositories/researchpaper.repository.js";
 import type { CreateResearchPaperInput } from "../types/researchpaper.types.js";
 
 export const uploadResearchPaperService = async (
@@ -8,6 +11,33 @@ export const uploadResearchPaperService = async (
     return await uploadResearchPaper(paper);
   } catch (error) {
     console.error("Error uploading research paper:", error);
+    throw error;
+  }
+};
+
+// get research papers
+export const getResearchPapersService = async (
+  page: number,
+  pageSize: number,
+  search: string | null,
+) => {
+  try {
+    const { researchPapers, total } = await getResearchPapers(
+      page,
+      pageSize,
+      search,
+    );
+    return {
+      researchPapers,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching research papers:", error);
     throw error;
   }
 };

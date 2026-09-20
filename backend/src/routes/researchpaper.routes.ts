@@ -1,5 +1,8 @@
 import express from "express";
-import { uploadResearchPaperController } from "../controllers/researchpaper.controller.js";
+import {
+  getResearchPapersController,
+  uploadResearchPaperController,
+} from "../controllers/researchpaper.controller.js";
 import { protectedRoute } from "../middleware/auth.js";
 import { uploadPaperFile } from "../middleware/upload.js";
 
@@ -12,5 +15,8 @@ router.post(
   uploadPaperFile,
   uploadResearchPaperController,
 );
+
+// get research papers
+router.get("/", getResearchPapersController);
 
 export default router;

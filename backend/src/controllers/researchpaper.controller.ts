@@ -1,14 +1,23 @@
 import type { Request, Response } from "express";
-import { handleResponse } from "../helper/helper.js";
+import { handleResponse, parsePositiveInt } from "../helper/helper.js";
 import {
   getOriginalFileName,
   hasPdfSignature,
   removeFile,
 } from "../helper/file.js";
 import { extractPdfMetadata } from "../helper/pdf.js";
-import { MAX_DB_VARCHAR_LENGTH, PAPERS_RELATIVE_DIR } from "../config/upload.js";
+import {
+  MAX_DB_VARCHAR_LENGTH,
+  PAPERS_RELATIVE_DIR,
+} from "../config/upload.js";
 import { toPublicResearchPaper } from "../models/researchpaper.model.js";
-import { uploadResearchPaperService } from "../services/researchpaper.service.js";
+import {
+  getResearchPapersService,
+  uploadResearchPaperService,
+} from "../services/researchpaper.service.js";
+
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 100;
 
 export const uploadResearchPaperController = async (
   req: Request,
@@ -58,5 +67,38 @@ export const uploadResearchPaperController = async (
     return handleResponse(res, 500, "Internal server error");
   } finally {
     if (!saved) await removeFile(file.path);
+  }
+};
+
+// get research papers
+export const getResearchPapersController = async (
+  req: Request,
+  res: Response,
+) => {
+  const page = parsePositiveInt(req.query.page, 1);
+  const pageSize = parsePositiveInt(
+    req.query.pageSize,
+    DEFAULT_PAGE_SIZE,
+    MAX_PAGE_SIZE,
+  );
+  const search =
+    typeof req.query.search === "string"
+      ? req.query.search.trim() || null
+      : null;
+
+  try {
+    const { researchPapers, pagination } = await getResearchPapersService(
+      page,
+      pageSize,
+      search,
+    );
+
+    return handleResponse(res, 200, "Research papers fetched successfully", {
+      researchPapers,
+      pagination,
+    });
+  } catch (error) {
+    console.error("Error fetching research papers:", error);
+    return handleResponse(res, 500, "Internal server error");
   }
 };
